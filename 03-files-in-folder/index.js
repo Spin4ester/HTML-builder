@@ -3,7 +3,7 @@ const path = require('path');
 // const { stdout, stdin } = process;
 
 
-fs.readdir(path.join(__dirname, 'secret-folder'), {withFileTypes: true}, (err, files) => {
+fs.readdir(path.join(__dirname, './secret-folder'), {withFileTypes: true}, (err, files) => {
   if (err)
     console.log(err);
   else {
