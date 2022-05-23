@@ -7,28 +7,28 @@ const path = require('path');
 
 function cloneDir(origDir, copyDir) {
 
-    fs.rm(copyDir, { recursive: true, force: true }, (err) => {
-      if (err) throw err;
+  fs.rm(copyDir, { recursive: true, force: true }, (err) => {
+    if (err) throw err;
     
-      fs.mkdir(copyDir, { recursive: true }, () => {});
+    fs.mkdir(copyDir, { recursive: true }, () => {});
   
-      fs.readdir(origDir, { withFileTypes: true }, (_, files) => {
-        files.forEach((file) => {
+    fs.readdir(origDir, { withFileTypes: true }, (_, files) => {
+      files.forEach((file) => {
   
-          const fileName = file.name;
-          const fileOrigPath = path.join(origDir, fileName);
-          const fileCopyPath = path.join(copyDir, fileName);
+        const fileName = file.name;
+        const fileOrigPath = path.join(origDir, fileName);
+        const fileCopyPath = path.join(copyDir, fileName);
     
-          //checking if file or folder
-          if (file.isFile()) {
-            fs.promises.copyFile(fileOrigPath, fileCopyPath);
-          } else {
-            cloneDir(fileOrigPath, fileCopyPath);
-          }
-        });
+        //checking if file or folder
+        if (file.isFile()) {
+          fs.promises.copyFile(fileOrigPath, fileCopyPath);
+        } else {
+          cloneDir(fileOrigPath, fileCopyPath);
+        }
       });
     });
-  }
+  });
+}
 
 
 //! HMTL Bundle
@@ -38,7 +38,7 @@ async function bundleHTML() {
     path.join(__dirname, './template.html')
   );
   
-  let html = template.toString();
+  let templateInner = template.toString();
   
   const components = await fs.promises.readdir(
     path.join(__dirname, './components')
@@ -49,17 +49,17 @@ async function bundleHTML() {
     const compInner = await fs.promises.readFile(compPath);
     const compName = comp.split('.')[0];
     const compValue = compInner.toString();
-    html = html.replace(`{{${compName}}}`, compValue);
+    templateInner = templateInner.replace(`{{${compName}}}`, compValue);
   }
 
   await fs.promises.writeFile(
-    path.join(__dirname, './project-dist', 'index.html'), html);
+    path.join(__dirname, './project-dist', '/index.html'), templateInner);
 }
 
 
 //! CREATING CSS FILE
 
-function bundleStyle() {
+function bundleStyles() {
 
   fs.readdir(path.join(__dirname, './styles'), (err, files) => {
     files.forEach(file => {
@@ -78,7 +78,7 @@ function bundleStyle() {
   });
     
   function createBundle(file) {
-    fs.open(path.join(__dirname, './project-dist', 'style.css'),
+    fs.open(path.join(__dirname, './project-dist', '/style.css'),
       'w',
       err => {
         if (err) throw err;
@@ -90,12 +90,8 @@ function bundleStyle() {
       console.log('Styles created');
     });
   }
-  
 }
   
-
-
-
 //! Final build
 
 function htmlBuild() {
@@ -105,7 +101,7 @@ function htmlBuild() {
     path.join(__dirname, './project-dist', '/assets')
   );
   bundleHTML();
-  bundleStyle();
+  bundleStyles();
 }
 
 htmlBuild();
